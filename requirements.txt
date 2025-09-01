@@ -1,0 +1,3 @@
+"# photo-to-sketch-using-opencv" 
+opencv-python
+numpy
