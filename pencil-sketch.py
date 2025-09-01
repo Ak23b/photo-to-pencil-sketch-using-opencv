@@ -61,9 +61,9 @@ app = tk.Tk() # main window for the application using tkinter
 app.title("Pencil Sketch Converter") # The title of our window
 frame = tk.Frame(app) # creating the frame for our application
 frame.pack(pady=10,padx=10) # Padding for our window for good look
-original_image_label = tk.label(frame) # Creating a label to display the original image
+original_image_label = tk.Label(frame) # Creating a label to display the original image
 original_image_label.grid(row=0, column=5, pady=5) # Positionig the original image label in the frame with some padding
-sketch_image_label = tk.label(frame) # Creating another label to name and display the sketch image
+sketch_image_label = tk.Label(frame) # Creating another label to name and display the sketch image
 sketch_image_label.grid(row=0,column=1, padx=5, pady=5) # Positioning the sketch image label next to the original image label
 btn_frame = tk.Frame(app) # Frame to hold our buttons
 btn_frame.pack(pady=10) # Another button frame below our first button frame 

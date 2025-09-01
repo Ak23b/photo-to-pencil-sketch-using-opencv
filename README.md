@@ -13,3 +13,6 @@
 
 ## Usage
 1. Clone the repository or download the code files.
+2. Run the Python script: pencil_sketch.py
+3. A GUI window will open. Click on the "Browse" button to select an image file.
+4. The selected image will be displayed along with its pencil sketch version.
