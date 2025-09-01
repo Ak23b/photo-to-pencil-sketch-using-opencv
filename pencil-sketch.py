@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -73,12 +72,3 @@ save_button = tk.Button(btn_frame,text="save sketch",command=save_sketch) # Butt
 save_button.grid(row=0,column=1,padx=5) # Positioning the save sketch button next to the open image button
 
 app.mainloop() # We start our application using thr main event loop, which will our app window responsive to user actions
-
-
-
-        
-           
-    
-    
-       
-    
