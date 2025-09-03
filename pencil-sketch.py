@@ -1,74 +1,175 @@
 import cv2
+import numpy as np
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
 
-# Dictionary to create our original and sketch Images
-images = {"original": None,"sketch":None}
+# ======================
+# Filters
+# ======================
+def apply_grayscale():
+    global img, panel
+    if img is not None:
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        display_image(gray, is_gray=True)
 
-# Function to handle opening an image filw
-def open_file():
-    filepath = filedialog.askopenfilename()
-    if not filepath: # If user dosen't select anything 
-        
-        return # nothing or do non
-    img = cv2.imread(filepath) # Using opencv and store it in the img variable
-    display_image(img, original=True) # Calling the display image function to show the original image to indicate the original image
-    sketch_img = convert_to_sketch(img) # Calling the convert to sketch function to transform the image to a sketch
-    display_image(sketch_img, original=False) # To display the sketch image passing false to indicate tht it is not the original
+def apply_blur():
+    global img, panel
+    if img is not None:
+        blurred = cv2.GaussianBlur(img, (7, 7), 0)
+        display_image(blurred)
 
-#Defining our convert to sketch function which will convert the image into a sketch-like version
-def convert_to_sketch(img):
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # First converting our image to grayscale
-    inverted_img = cv2.bitwise_not(gray_img) # Invert the grayscale image to get its negative
-    blurred_img = cv2.GaussianBlur(inverted_img,(21,21),sigmaX=0,sigmaY=0)  # Apply Gaussian blur to inverted image to smooth it out
-    inverted_blur_img = cv2.bitwise_not(blurred_img) # Inverting the blurred image
-    sketch_img = cv2.divide(gray_img, inverted_blur_img, scale=256.0) # Divide the gray image and the inverted blur image to get a sketch effect
-    return sketch_img # return the resulting sketch image
+def apply_sharpen():
+    global img, panel
+    if img is not None:
+        kernel = np.array([[0, -1, 0],
+                           [-1, 5,-1],
+                           [0, -1, 0]])
+        sharpened = cv2.filter2D(img, -1, kernel)
+        display_image(sharpened)
 
-# Defining our display image function that will handle showing images in our gui
-def display_image(img, original):
-    img_rgb = cv2.cvtColor(img,cv2.COLOR_BGR2RGB) if original else img # If it's the original image, we convert it to RGB colorspace otherwise leave it as is
-    img_pil = Image.fromarray(img_rgb) # Converting our numpy array image to a pil image object
-    img_tk = ImageTk.PhotoImage(image=img_pil) # Create a tkinter compatible photo image from the pil image
-    
-    # Store the image in the dictionary
-    if original:
-        images["original"] = img_pil # If we're dealing with a original image we store it inside the dictionary under the original key
-    else:
-        images["sketch"] = img_pil
-    label = original_image_label if original else sketch_image_label # We choose which label to update whether it's the original or sketch image
-    label.config(image=img_tk) # We update the selected image lable with the new tkinter photo image
-    label.image = img_tk # Having a reference to the image to prevent it from being garbage collected
+def apply_edge_detection():
+    global img, panel
+    if img is not None:
+        edges = cv2.Canny(img, 100, 200)
+        display_image(edges, is_gray=True)
 
-# Defining our save sketch funtion that will handle saving our sketch image
-def save_sketch():
-    if images["sketch"] is None: # if there's a sketch image to save, we save it, else  show error message
-        messagebox.showerror("Error", "No sketch to save.")
-        return
-    sketch_filepath = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files","*.png")]) #File dialog to let the user choose where to save their sketch it will also default to png files
-    
-     # if user actually selected a filepath
-    if not sketch_filepath: # if they did not select filepath we stop here
-        return
-    # Save the PIL Image (sketch) to the file
-    images["sketch"].save(sketch_filepath,"PNG")
-    messagebox.showinfo("Saved", f"Sketch saved to {format(sketch_filepath)}.") # Letting the user know that their file has been saved
+# ======================
+# Editor
+# ======================
+def increase_brightness():
+    global img, panel
+    if img is not None:
+        bright = cv2.convertScaleAbs(img, alpha=1, beta=40)
+        display_image(bright)
 
-app = tk.Tk() # main window for the application using tkinter
-app.title("Pencil Sketch Converter") # The title of our window
-frame = tk.Frame(app) # creating the frame for our application
-frame.pack(pady=10,padx=10) # Padding for our window for good look
-original_image_label = tk.Label(frame) # Creating a label to display the original image
-original_image_label.grid(row=0, column=5, pady=5) # Positionig the original image label in the frame with some padding
-sketch_image_label = tk.Label(frame) # Creating another label to name and display the sketch image
-sketch_image_label.grid(row=0,column=1, padx=5, pady=5) # Positioning the sketch image label next to the original image label
-btn_frame = tk.Frame(app) # Frame to hold our buttons
-btn_frame.pack(pady=10) # Another button frame below our first button frame 
-open_button = tk.Button(btn_frame,text="Open Image", command=open_file) # Another button called open file which call the "Open File" function when clicked
-open_button.grid(row=0,column=0,padx=5) # Positioning the open image button in the button frame
-save_button = tk.Button(btn_frame,text="save sketch",command=save_sketch) # Button called "Save Sketch" that will call the "save_sketch" function when clicked
-save_button.grid(row=0,column=1,padx=5) # Positioning the save sketch button next to the open image button
+def decrease_brightness():
+    global img, panel
+    if img is not None:
+        dark = cv2.convertScaleAbs(img, alpha=1, beta=-40)
+        display_image(dark)
 
-app.mainloop() # We start our application using thr main event loop, which will our app window responsive to user actions
+def rotate_image():
+    global img, panel
+    if img is not None:
+        (h, w) = img.shape[:2]
+        center = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(center, 45, 1.0)
+        rotated = cv2.warpAffine(img, M, (w, h))
+        display_image(rotated)
+
+def resize_image():
+    global img, panel
+    if img is not None:
+        resized = cv2.resize(img, None, fx=0.5, fy=0.5)
+        display_image(resized)
+
+# ======================
+# Webcam
+# ======================
+def start_webcam():
+    global cap, webcam_running
+    if not webcam_running:
+        cap = cv2.VideoCapture(0)
+        webcam_running = True
+        update_webcam()
+
+def stop_webcam():
+    global cap, webcam_running
+    if webcam_running:
+        webcam_running = False
+        cap.release()
+
+def update_webcam():
+    global cap, webcam_running, webcam_panel
+    if webcam_running:
+        ret, frame = cap.read()
+        if ret:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            imgtk = ImageTk.PhotoImage(Image.fromarray(frame))
+            webcam_panel.imgtk = imgtk
+            webcam_panel.config(image=imgtk)
+        webcam_panel.after(20, update_webcam)
+
+# ======================
+# Helpers
+# ======================
+def open_image():
+    global img, panel
+    path = filedialog.askopenfilename()
+    if path:
+        img = cv2.imread(path)
+        display_image(img)
+
+def display_image(cv_img, is_gray=False):
+    global panel, img
+    if not is_gray:
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+    imgtk = ImageTk.PhotoImage(image=Image.fromarray(cv_img))
+    panel.imgtk = imgtk
+    panel.config(image=imgtk)
+    img = cv_img if not is_gray else cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
+
+# ======================
+# Main App
+# ======================
+root = tk.Tk()
+root.title("Vision Studio")
+root.geometry("800x600")
+
+notebook = ttk.Notebook(root)
+notebook.pack(fill="both", expand=True)
+
+# Tabs
+filters_tab = tk.Frame(notebook, bg="white")
+editor_tab = tk.Frame(notebook, bg="white")
+webcam_tab = tk.Frame(notebook, bg="white")
+
+notebook.add(filters_tab, text="Filters")
+notebook.add(editor_tab, text="Editor")
+notebook.add(webcam_tab, text="Webcam")
+
+# Global variables
+img = None
+cap = None
+webcam_running = False
+
+# Shared image panel
+panel = tk.Label(root)
+panel.pack(side="bottom", pady=10)
+
+# Webcam panel
+webcam_panel = tk.Label(webcam_tab)
+webcam_panel.pack(pady=10)
+
+# ======================
+# Button Colors
+# ======================
+FILTER_BTN_COLOR = "#ADD8E6"   # Light Blue
+EDITOR_BTN_COLOR = "#FFC0CB"   # Pink
+WEBCAM_BTN_COLOR = "#FFA500"   # Orange
+
+# ======================
+# Filters tab buttons
+# ======================
+tk.Button(filters_tab, text="Open Image", bg=FILTER_BTN_COLOR, command=open_image).pack(pady=5)
+tk.Button(filters_tab, text="Grayscale", bg=FILTER_BTN_COLOR, command=apply_grayscale).pack(pady=5)
+tk.Button(filters_tab, text="Blur", bg=FILTER_BTN_COLOR, command=apply_blur).pack(pady=5)
+tk.Button(filters_tab, text="Sharpen", bg=FILTER_BTN_COLOR, command=apply_sharpen).pack(pady=5)
+tk.Button(filters_tab, text="Edge Detection", bg=FILTER_BTN_COLOR, command=apply_edge_detection).pack(pady=5)
+
+# ======================
+# Editor tab buttons
+# ======================
+tk.Button(editor_tab, text="Increase Brightness", bg=EDITOR_BTN_COLOR, command=increase_brightness).pack(pady=5)
+tk.Button(editor_tab, text="Decrease Brightness", bg=EDITOR_BTN_COLOR, command=decrease_brightness).pack(pady=5)
+tk.Button(editor_tab, text="Rotate", bg=EDITOR_BTN_COLOR, command=rotate_image).pack(pady=5)
+tk.Button(editor_tab, text="Resize", bg=EDITOR_BTN_COLOR, command=resize_image).pack(pady=5)
+
+# ======================
+# Webcam tab buttons
+# ======================
+tk.Button(webcam_tab, text="Start Webcam", bg=WEBCAM_BTN_COLOR, command=start_webcam).pack(pady=5)
+tk.Button(webcam_tab, text="Stop Webcam", bg=WEBCAM_BTN_COLOR, command=stop_webcam).pack(pady=5)
+
+root.mainloop()
