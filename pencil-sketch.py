@@ -4,10 +4,12 @@ from tkinter import ttk, filedialog, messagebox
 from PIL import Image, ImageTk
 import numpy as np
 
+
 # Global variables
 img = None
 panel = None
 cap = None
+
 
 # Button colors
 FILTER_BTN_COLOR = "#ADD8E6"   # Light Blue
