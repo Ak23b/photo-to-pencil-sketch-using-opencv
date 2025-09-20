@@ -16,12 +16,14 @@ FILTER_BTN_COLOR = "#ADD8E6"   # Light Blue
 EDITOR_BTN_COLOR = "#FFC0CB"   # Pink
 WEBCAM_BTN_COLOR = "#FFA500"   # Orange
 
+
 # ----------------- Image Display -----------------
 def display_image(cv_img, is_gray=False):
     global panel, img
     # Convert grayscale images properly
     if not is_gray:
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+
 
     # Resize to fit window (max 700x400)
     max_w, max_h = 700, 400
@@ -30,9 +32,11 @@ def display_image(cv_img, is_gray=False):
     new_w, new_h = int(w * scale), int(h * scale)
     resized = cv2.resize(cv_img, (new_w, new_h))
 
+
     imgtk = ImageTk.PhotoImage(image=Image.fromarray(resized))
     panel.imgtk = imgtk
     panel.config(image=imgtk)
+
 
     # Store original image (full res) for processing
     img = cv_img if not is_gray else cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
