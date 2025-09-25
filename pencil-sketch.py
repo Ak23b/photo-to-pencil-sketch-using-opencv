@@ -48,6 +48,7 @@ def open_file():
         cv_img = cv2.imread(filepath)
         display_image(cv_img)
 
+
 # ----------------- Filters -----------------
 def apply_grayscale():
     global img
