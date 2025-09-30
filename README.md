@@ -1,4 +1,5 @@
-"# photo-to-pencil-sketch-using-opencv" 
+# photo-to-pencil-sketch-using-opencv
+
 --- A simple project that converts a photo to a pencil sketch using OpenCV and tkinter in Python.
 --- Tkinter is used to create a graphical user interface (GUI) for easy interaction.
 
