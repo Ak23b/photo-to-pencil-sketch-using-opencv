@@ -8,6 +8,7 @@
 - Python 3.x
 - OpenCV library
 - NumPy library
+- Tkinter (usually included with Python installations)
 
 ## Installation
 
