@@ -15,7 +15,7 @@
 1. Install Python 3.x from the official website: [https://www.python.org/downloads/](https://www.python.org/downloads/)
 2. Install OpenCV and NumPy using pip:
 
-# Installing required libraries
+### Installing required libraries
 
 'install -r requirements.txt'
 
@@ -25,3 +25,7 @@
 2. Run the Python script: pencil_sketch.py
 3. A GUI window will open. Click on the "Browse" button to select an image file.
 4. The selected image will be displayed along with its pencil sketch version.
+
+# Example command to run the script
+'python pencil_sketch.py'
+5. Save the pencil sketch image if desired.
