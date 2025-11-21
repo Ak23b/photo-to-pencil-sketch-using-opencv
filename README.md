@@ -9,6 +9,7 @@
 - OpenCV library
 - NumPy library
 - Tkinter (usually included with Python installations)
+- PIL (Pillow) library
 
 ## Installation
 
@@ -29,4 +30,5 @@
 ## Example command to run the script
 
 'python pencil_sketch.py'
+
 5. Save the pencil sketch image if desired.
