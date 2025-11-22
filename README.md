@@ -26,9 +26,8 @@
 2. Run the Python script: pencil_sketch.py
 3. A GUI window will open. Click on the "Browse" button to select an image file.
 4. The selected image will be displayed along with its pencil sketch version.
+5. Save the pencil sketch image if desired.
 
 ## Example command to run the script
 
 'python pencil_sketch.py'
-
-5. Save the pencil sketch image if desired.
